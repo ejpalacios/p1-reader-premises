@@ -356,8 +356,10 @@ To access this page go to [http://localhost:3000] and log in with the default cr
 
 ## Licence notice
 
-Please note that although this code
-[](https://github.com/pwitab/dlms-cosem/blob/master/LICENSE)
+Please note that although this code is provided under the GNU General Public License v3 some of the dependencies might have more restrictive clauses.
+
+In particular the DSMR parser `dsmr-parser` depends on the `dlms-cosem` library.
+Please note that its current [LICENSE](https://github.com/pwitab/dlms-cosem/blob/master/LICENSE) limits the use to no more than a combined number of 100 DLMS end devices.
 
 ## Acknowledgement
 
