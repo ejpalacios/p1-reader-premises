@@ -1,0 +1,10 @@
+apiVersion: 1
+
+providers:
+  - name: p1-reader
+    folder: P1-reader
+    type: file
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/p1-reader

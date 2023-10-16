@@ -1,0 +1,71 @@
+version: "3.8"
+
+services:
+  mqtt-broker:
+    image: docker.io/eclipse-mosquitto
+    hostname: mosquitto
+    networks:
+      - premises
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+    container_name: mosquitto
+    restart: always
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto:/mosquitto/config:Z
+
+  timescaledb:
+    image: docker.io/timescale/timescaledb:latest-pg14
+    hostname: timescaledb
+    networks:
+      - premises
+    container_name: timescaledb
+    ports:
+      - "5432:5432"
+    expose:
+      - 5432
+    environment:
+      - TZ=Europe/Brussels
+      - PG_TZ=Europe/Brussels
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=premises
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      timeout: 5s
+      interval: 20s
+      retries: 10
+
+    volumes:
+      - timescaledb:/var/lib/postgresql/data
+
+  grafana:
+    image: docker.io/grafana/grafana
+    hostname: grafana
+    networks:
+      - premises
+    depends_on:
+      timescaledb:
+        condition: service_healthy
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    expose:
+      - 3000
+    restart: always
+    volumes:
+      - grafana:/var/lib/grafana
+      - ./grafana/datasources/:/etc/grafana/provisioning/datasources/:Z
+      - ./grafana/dashboards/:/etc/grafana/provisioning/dashboards/:Z
+
+volumes:
+  timescaledb:
+  grafana:
+
+networks:
+  premises:
+    external: true

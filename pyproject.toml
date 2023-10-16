@@ -1,0 +1,58 @@
+[tool.mypy]
+disallow_untyped_defs = true
+warn_unused_ignores = true
+show_error_codes = true
+
+[[tool.mypy.overrides]]
+ignore_missing_imports = true
+module = [
+    "dsmr_parser.*",
+]
+
+[tool.isort]
+profile = "black"
+
+[tool.coverage.run]
+omit = ["*/test*", "*__init__*"]
+
+[tool.poetry]
+name = "p1-reader"
+version = "0.1.0"
+description = "P1 service utility for Belgian Smart Meters"
+authors = ["Emilio J. Palacios-Garcia <emiliojose.palaciosgarcia@kuleuven.be>"]
+readme = "README.md"
+packages = [{include = "p1reader"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+psycopg2-binary = "^2.9.5"
+pydantic = "^2.0.2"
+pytz = "^2023.3"
+dsmr-parser = "^1.2.4"
+paho-mqtt = "^1.6.1"
+pyyaml = "^6.0"
+argparse = "^1.4.0"
+pydantic-settings = "^2.0.1"
+
+
+[tool.poetry.group.test.dependencies]
+pytest = "^7.2.2"
+pytest-coverage = "^0.0"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.3.0"
+isort = "^5.12.0"
+mypy = "^1.1.1"
+python-dotenv = "^1.0.0"
+
+
+[tool.poetry.group.opt.dependencies]
+jupyterlab = "^4.0.7"
+pandas = "^2.0.2"
+matplotlib = "^3.8.0"
+ipympl = "^0.9.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

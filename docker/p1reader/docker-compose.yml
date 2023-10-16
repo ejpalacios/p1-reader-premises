@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  p1-reader:
+    image: docker.io/ejpalacios/p1-reader:latest
+    hostname: reader
+    networks:
+      - premises
+    container_name: p1-reader
+    environment:
+      - PORT__ID=/dev/ttyUSB0
+      - LOG_LEVEL=INFO
+      - DB__HOST=timescaledb
+      - DB__PORT=5432
+      - DB__DATABASE=premises
+      - DB__USER=postgres
+      - DB__PASSWORD=password
+      - MQTT__HOST=mosquitto
+      - MQTT__PORT=1883
+    restart: always
+    devices:
+      - /dev/ttyUSB0:/dev/ttyUSB0
+    security_opt:
+      - label:disable
+
+networks:
+  premises:
+    external: true

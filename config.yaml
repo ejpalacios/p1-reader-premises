@@ -1,0 +1,26 @@
+# Posible data sources. Only one of them is possible
+# =============================================================================
+# File (mostly for testing)
+file:
+  path: "data/test.txt"
+# P1 to USB converter
+# port:
+#   id: "/dev/ttyUSB0"
+#
+# Posible data sinks
+# =============================================================================
+# JSON objects in text file
+# dump:
+#   file: "data/output.txt"
+# # Database
+# db:
+#   host: "localhost"
+#   port: 5432
+#   database: "premises"
+#   user: "postgres"
+#   password: "password"
+# # MQTT Broker
+# mqtt:
+#   host: "localhost"
+#   port: 1883
+#   qos: 1

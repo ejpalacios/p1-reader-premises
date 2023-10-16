@@ -1,0 +1,15 @@
+apiVersion: 1
+
+datasources:
+  - name: p1-reader
+    type: postgres
+    uid: "p1-reader"
+    url: timescaledb:5432
+    database: "premises"
+    user: postgres
+    editable: true
+    secureJsonData:
+      password: "password"
+    jsonData:
+      sslmode: "disable" # disable/require/verify-ca/verify-full
+      timescaledb: true
