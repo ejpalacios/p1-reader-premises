@@ -12,7 +12,8 @@ logging.basicConfig(
 )
 LOGGER = logging.getLogger(__name__)
 
-if __name__ == "__main__":
+
+def main() -> None:
     parser = argparse.ArgumentParser(description="Reader service")
     parser.add_argument(
         "--config",
@@ -27,5 +28,9 @@ if __name__ == "__main__":
     else:
         config = ReaderServiceConfig()
 
-    LOGGER.info(f"Running service")
+    LOGGER.info("Running service")
     ReaderService(config.input_stream, config.output_streams).run()
+
+
+if __name__ == "__main__":
+    main()
