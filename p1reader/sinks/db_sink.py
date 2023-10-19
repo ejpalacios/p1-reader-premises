@@ -72,7 +72,7 @@ class DBSink(DataSink):
             con: psycopg2.extensions.connection = cls._conn
         with con:
             try:
-                with con._conn.cursor() as cur:  # type: ignore
+                with con.cursor() as cur:
                     execute_values(
                         cur,
                         sql=sql_collection[op.INSERT],
@@ -95,7 +95,7 @@ class DBSink(DataSink):
         if cls._conn is not None:
             con: psycopg2.extensions.connection = cls._conn
         with con:
-            with con.cursor() as cur:  # type: ignore
+            with con.cursor() as cur:
                 if measurements is not None:
                     for measure in measurements:
                         values[measure] = []
