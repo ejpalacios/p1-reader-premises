@@ -3,6 +3,7 @@ HYPER = "HYPER"
 INSERT = "INSERT"
 TEMPLATE = "TEMPLATE"
 READ = "READ"
+DELETE = "DELETE"
 
 ELEC = {
     CREATE: """
@@ -22,7 +23,8 @@ ELEC = {
         obis_name = %s AND
         time BETWEEN %s AND %s
         ORDER BY time ASC;
-    """
+    """,
+    DELETE: "DELETE FROM elec_measurement WHERE device_id = %s AND time BETWEEN %s AND %s;",
 }
 
 MBUS = {
@@ -41,10 +43,11 @@ MBUS = {
     READ: """
         SELECT * FROM mbus_measurement 
         WHERE device_id = %s AND
-        mbus_id = % AND
+        mbus_id = %s AND
         time BETWEEN %s AND %s
         ORDER BY time ASC;
-    """
+    """,
+    DELETE: "DELETE FROM mbus_measurement WHERE device_id = %s AND time BETWEEN %s AND %s;",
 }
 
 
@@ -64,7 +67,8 @@ PEAK = {
         WHERE device_id = %s AND
         time BETWEEN %s AND %s
         ORDER BY time ASC;
-    """
+    """,
+    DELETE: "DELETE FROM peak_demand WHERE device_id = %s AND time BETWEEN %s AND %s;",
 }
 
 
@@ -85,5 +89,6 @@ PEAK_HISTORY = {
         WHERE device_id = %s AND
         time BETWEEN %s AND %s
         ORDER BY time ASC;
-    """
+    """,
+    DELETE: "DELETE FROM peak_demand_history WHERE device_id = %s AND time BETWEEN %s AND %s;",
 }

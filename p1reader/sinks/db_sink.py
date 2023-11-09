@@ -86,8 +86,8 @@ class DBSink(DataSink):
     def query_sql(
         cls,
         device_id: str,
-        start_date: str,
-        end_date: str,
+        start_date: datetime,
+        end_date: datetime,
         sql_collection: dict,
         measurements: Optional[list] = None,
     ) -> dict:
@@ -110,6 +110,25 @@ class DBSink(DataSink):
                         (device_id, start_date, end_date),
                     )
                     values["Default"] = cur.fetchall()
+        return values
+
+    @classmethod
+    def delete_sql(
+        cls,
+        device_id: str,
+        start_date: datetime,
+        end_date: datetime,
+        sql_collection: dict,
+    ) -> dict:
+        values: dict = dict()
+        if cls._conn is not None:
+            con: psycopg2.extensions.connection = cls._conn
+        with con:
+            with con.cursor() as cur:
+                cur.execute(
+                    sql_collection[op.DELETE],
+                    (device_id, start_date, end_date),
+                )
         return values
 
     @classmethod
@@ -164,8 +183,8 @@ class DBSink(DataSink):
     @classmethod
     def query_n_phases(cls, device_id: str) -> int:
         query_phase = """
-            SELECT DISTINCT(obis_name) FROM elec_measurement
-            WHERE device_id = %s AND obis_name = 'P+(L3)' LIMIT 1000;
+            SELECT * FROM elec_measurement
+            WHERE device_id = %s AND obis_name = 'P+(L3)' LIMIT 10;
         """
         phases = 1
         if cls._conn is not None:
