@@ -43,22 +43,23 @@ def main() -> None:
     if DEVICE_ID not in ids:
         raise ValueError(f"{DEVICE_ID=} not found in {ids=}")
 
-    start_date, end_date = db.query_date_range(DEVICE_ID)
+    START_DATE, END_DATE = db.query_date_range(DEVICE_ID)
     if START is not None:
-        start_date = START
+        START_DATE = datetime.fromisoformat(START)
     if END is not None:
-        end_date = END
+        END_DATE = datetime.fromisoformat(END)
 
-    if start_date is not None and end_date is not None:
-        print(f"{start_date.isoformat()}, {end_date.isoformat()}")
+    if START_DATE is not None and END_DATE is not None:
+        print(f"{START_DATE.isoformat()}, {END_DATE.isoformat()}")
     else:
         raise ValueError("No data found in database")
 
     measurements = get_measurements_list(db.query_n_phases(DEVICE_ID))
 
-    while start_date < end_date:
-        start_slice = start_date
-        end_slice = start_date + timedelta(days=30)
+    date_pointer = START_DATE
+    while date_pointer < END_DATE:
+        start_slice = START_DATE
+        end_slice = START_DATE + timedelta(days=30)
         print(f"{start_slice.isoformat()}, {end_slice.isoformat()}")
 
         # Backup electrical measurements
@@ -69,30 +70,32 @@ def main() -> None:
         # Backup mbus measurements
         mbus_ids = db.query_mbus_ids(DEVICE_ID)
         if len(mbus_ids) != 0:
-            results = db.query_sql(DEVICE_ID, start_slice, end_slice, op.MBUS)
+            results = db.query_sql(DEVICE_ID, start_slice, end_slice, op.MBUS, mbus_ids)
             df_mbus = dict_to_df(results, 4)
             write_csv(df_mbus, "mbus", PATH, DEVICE_ID, start_slice, end_slice)
 
-        start_date += timedelta(days=30)
+        date_pointer += timedelta(days=30)
 
     # Backup peak demand
-    results = db.query_sql(DEVICE_ID, start_date, end_date, op.PEAK)
+    results = db.query_sql(DEVICE_ID, START_DATE, END_DATE, op.PEAK)
     df_peak = dict_to_df(results, 2)
-    write_csv(df_peak, "peak", PATH, DEVICE_ID, start_date, end_date)
+    write_csv(df_peak, "peak", PATH, DEVICE_ID, START_DATE, END_DATE)
 
     # Backup peak demand history
-    results = db.query_sql(DEVICE_ID, start_date, end_date, op.PEAK_HISTORY)
-    df_peak_his = dict_to_df(results, 2)
-    write_csv(df_peak_his, "peak_history", PATH, DEVICE_ID, start_date, end_date)
+    results = db.query_sql(DEVICE_ID, START_DATE, END_DATE, op.PEAK_HISTORY)
+    df_peak_his = dict_to_df(results, 3)
+    write_csv(df_peak_his, "peak_history", PATH, DEVICE_ID, START_DATE, END_DATE)
 
     value = input("Backup Completed. Would you like to deleted all data [N/y]: ")
     if value.lower().strip() == "y":
         value_confirm = input("This operation cannot be reversed are you sure [N/y]")
         if value_confirm.lower().strip() == "y":
-            db.delete_sql(DEVICE_ID, start_date, end_date, op.ELEC)
-            db.delete_sql(DEVICE_ID, start_date, end_date, op.MBUS)
-            db.delete_sql(DEVICE_ID, start_date, end_date, op.PEAK)
-            db.delete_sql(DEVICE_ID, start_date, end_date, op.PEAK_HISTORY)
+            db.delete_sql(DEVICE_ID, START_DATE, END_DATE, op.ELEC)
+            db.delete_sql(DEVICE_ID, START_DATE, END_DATE, op.MBUS)
+            db.delete_sql(DEVICE_ID, START_DATE, END_DATE, op.PEAK)
+            db.delete_sql(DEVICE_ID, START_DATE, END_DATE, op.PEAK_HISTORY)
+
+    db.close()
 
 
 def dict_to_df(results: dict, index_value: int, index_time: int = 0) -> pd.DataFrame:

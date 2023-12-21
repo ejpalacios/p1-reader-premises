@@ -15,7 +15,7 @@ ELEC = {
         PRIMARY KEY (time, device_id, obis_name)
     );""",
     HYPER: "SELECT create_hypertable('elec_measurement', 'time', if_not_exists => TRUE);",
-    INSERT: "INSERT INTO elec_measurement (time, device_id, obis_name, value) VALUES %s;",
+    INSERT: "INSERT INTO elec_measurement (time, device_id, obis_name, value) VALUES %s ON CONFLICT DO NOTHING;",
     TEMPLATE: "(%s, %s, %s, %s)",
     READ: """
         SELECT * FROM elec_measurement 
