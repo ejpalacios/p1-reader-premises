@@ -33,13 +33,12 @@ MBUS = {
         time TIMESTAMPTZ NOT NULL,
         device_id TEXT NOT NULL,
         mbus_id TEXT NOT NULL,
-        mbus_type TEXT,
         value REAL,
         PRIMARY KEY (time, device_id, mbus_id)
     );""",
     HYPER: "SELECT create_hypertable('mbus_measurement', 'time', if_not_exists => TRUE);",
-    INSERT: "INSERT INTO mbus_measurement (time, device_id, mbus_id, mbus_type, value) VALUES %s ON CONFLICT DO NOTHING;",
-    TEMPLATE: "(%s, %s, %s, %s, %s)",
+    INSERT: "INSERT INTO mbus_measurement (time, device_id, mbus_id, value) VALUES %s ON CONFLICT DO NOTHING;",
+    TEMPLATE: "(%s, %s, %s, %s)",
     READ: """
         SELECT * FROM mbus_measurement 
         WHERE device_id = %s AND

@@ -18,9 +18,9 @@ Data logger and basic visualisation tool for Belgian Smart meters
 
 ## Roadmap
 
-- Add instructions for deployment in Raspberry Pi devices
-- Add utilities to back up data from DB
+- :white_check_mark: Add utilities to back up data from DB
 - Add example Jupyter Notebooks on data reading and visualisation
+- Add instructions for deployment in Raspberry Pi devices
 
 ## Table of Contents
 
@@ -30,6 +30,7 @@ Data logger and basic visualisation tool for Belgian Smart meters
 4. [Standalone usage](#standalone-usage)
 5. [Docker image usage](#docker-image-usage)
 6. [Docker compose usage](#docker-compose-usage)
+7. [Data back up and restore](#data-back-up-and-restore)
 
 ## Prerequisites
 
@@ -353,6 +354,120 @@ To access this page go to [http://localhost:3000] and log in with the default cr
 1. Measurement logger: Real-time electricity measurements
 2. Gas & Water logger: When installed, it displays the real-time measurements from these type of meters as collected via the Wireless M-Bus interface.
 3. Maximum demand logger: Historical monthly consumption peak and real-time tracking of maximum demand
+
+## Data back up and restore
+
+The data logger is conceived as a standalone device that can operate without any network connection.
+This means, however, that the data must be periodically backed up.
+
+Two utility scripts are provided to back up the data stored in the database (DB) into comma separated files (CSV), as well as for the inverse restoration process.
+
+### DB data to CSV files
+
+To save the data in the DB as CSV files the script `utils/backup.py` could be used. This script has a set of options which are provided via command line arguments.
+
+#### Selection of meter to back up
+
+The main argument of the script is the `DEVICE_ID`. It determines the meter to be backed up.
+
+- `-i DEVICE_ID`, `--device_id DEVICE_ID`: Meter identifier (EAN). **REQUIRED**
+
+#### Options for source DB connection
+
+These options control the connection to the source DB where the data is stored.
+
+- `-H HOSTNAME`, `--hostname HOSTNAME`: DB hostname. Default `localhost`.
+- `-P PORT`, `--port PORT`: DB port. Default `5432`.
+- `-D DATABASE`, `--database DATABASE`: DB name. Default `premises`.
+- `-U USER`, `--user USER`: DB username. Default `postgres`.
+- `-p PASSWORD`, `--password PASSWORD`: DB password. Default `password`.
+
+> Note that his values match the default configuration of the locally deployed `docker-compose` environment.
+
+#### Options for destination path
+
+This option control where the output CSV files will be saved.
+
+- `-o OUTPUT_PATH`, `--output_path OUTPUT_PATH` Output path for CSV files. Default `./`.
+
+#### Options for date range selection
+
+The date range is automatically inferred from the stored data. However, two arguments are provided to explicitly select these values.
+
+- `-s START`, `--start START`: Initial date. If not given, the oldest date in the DB will be considered.
+- `-e END`, `--end END`: Final date. If not given, the newest date in the DB will be considered.
+
+> Date must be provided in ISO format with timezone (YYYY-MM-DDThh:mm:ss±hh:mm)
+
+#### Options for data to back up
+
+These options control the data that is backed up from the DB. **AT LEAST ONE** of the flags must be provided, otherwise no data will be saved.
+
+- `--all`: Backup all data. (Equivalent to `--elec --mbus --peak --peak_history`)
+- `--elec`: Backup electricity data
+- `--mbus`: Backup mbus devices data
+- `--peak`: Backup peak consumption data
+- `--peak_history`: Backup peak consumption history data
+
+### Example of use
+
+The script should be run using the poetry environment. Please check the software [prerequisites](#prerequisites).
+
+The command below will back up all data for the meter with EAN number `1SAG1100000292` with the default configuration.
+
+```bash
+poetry run python ./utils/backup.py -i 1SAG1100000292 --all
+```
+
+### CSV files to DB
+
+To revert the above operation and restore the data saved into the CSV files to the same or another DB, the script `utils/restore.py` should be used. As in the previous case several options are provided.
+
+> The restoration script assumes that the name of the CSV files has not been altered.
+
+#### Selection of meter to restore
+
+The main argument of the script is again the `DEVICE_ID`. It determines relevant CSV for that meter.
+
+- `-i DEVICE_ID`, `--device_id DEVICE_ID`: Meter identifier (EAN). **REQUIRED**
+
+#### Options for destination DB connection
+
+These options control the connection to the destination DB where the data will be stored.
+
+- `-H HOSTNAME`, `--hostname HOSTNAME`: DB hostname. Default `localhost`.
+- `-P PORT`, `--port PORT`: DB port. Default `5432`.
+- `-D DATABASE`, `--database DATABASE`: DB name. Default `premises`.
+- `-U USER`, `--user USER`: DB username. Default `postgres`.
+- `-p PASSWORD`, `--password PASSWORD`: DB password. Default `password`.
+
+> Note that his values match the default configuration of the locally deployed `docker-compose` environment.
+
+#### Options for source path
+
+This option control where the input CSV files will be saved.
+
+- `-f INPUT_FOLDER`, `--input_folder INPUT_FOLDER`: Input folder with the CSV files. Default `./`.
+
+#### Options for data to restore
+
+These options control the data that is saved into the DB. **AT LEAST ONE** of the flags must be provided, otherwise no data will be saved.
+
+- `--all`: Backup all data. (Equivalent to `--elec --mbus --peak --peak_history`)
+- `--elec`: Backup electricity data
+- `--mbus`: Backup mbus devices data
+- `--peak`: Backup peak consumption data
+- `--peak_history`: Backup peak consumption history data
+
+### Example of use
+
+The script should be run using the poetry environment. Please check the software [prerequisites](#prerequisites).
+
+The command below will restore all CSV files in the current folder to the DB for the meter with EAN number `1SAG1100000292` with the default configuration.
+
+```bash
+poetry run python ./utils/restore.py -i 1SAG1100000292 --all
+```
 
 ## Licence notice
 
