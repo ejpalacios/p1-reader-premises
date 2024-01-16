@@ -16,12 +16,6 @@ Data logger and basic visualisation tool for Belgian Smart meters
 - TimescaleDB instance
 - MQTT Broker
 
-## Roadmap
-
-- :white_check_mark: Add utilities to back up data from DB
-- Add example Jupyter Notebooks on data reading and visualisation
-- :white_check_mark: Add instructions for deployment in Raspberry Pi devices
-
 ## Table of Contents
 
 1. [Prerequisites](#prerequisites)
@@ -31,7 +25,8 @@ Data logger and basic visualisation tool for Belgian Smart meters
 5. [Docker image usage](#docker-image-usage)
 6. [Docker compose usage](#docker-compose-usage)
 7. [Data back up and restore](#data-back-up-and-restore)
-8. [Deployment to Raspberry Pi](https://github.com/ejpalacios/p1-reader-premises/blob/main/rpi-install/install_device.md)
+8. [Example notebook](#example-notebook)
+9. [Deployment to Raspberry Pi](https://github.com/ejpalacios/p1-reader-premises/blob/main/rpi-install/install_device.md)
 
 ## Prerequisites
 
@@ -469,6 +464,10 @@ The command below will restore all CSV files in the current folder to the DB for
 ```bash
 poetry run python ./utils/restore.py -i 1SAG1100000292 --all
 ```
+
+## Example notebook
+
+The data can be accessed by directly connection to the DB. An example notebook is provided in the folder `notebooks` with the necessary steps.
 
 ## Licence notice
 
