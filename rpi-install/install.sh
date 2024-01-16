@@ -1,21 +1,17 @@
 #!/bin/bash
 
-CONFIG_PATH=./config
 BACKUP_PATH=~/.network_backup
 DHCPCD_CONFIG_FILE=/etc/dhcpcd.conf
-HOSTAPD_CONFIG_FILE=/etc/hostapd/hostapd.conf
 DNSMASQ_CONFIG_FILE=/etc/dnsmasq.conf
 
 function usage() {
-    echo "Install dependencies and tools of the In-Premises HEMS"
+    echo "Install dependencies and tools"
     echo
     echo "Arguments:"
     echo "  -a | Install Access Point"
-    echo "  -b | Install PYTHON libraries for DB back up"
     echo "  -c | Install DOCKER-COMPOSE"
     echo "  -d | Install DOCKER"
     echo "  -p | Install PORTAINER"
-    echo "  -f | Install full requirements. Note this is similar to -abcdp"
     echo "  -h | Show this help"
 }
 
@@ -42,16 +38,6 @@ function install_portainer() {
     docker run -d -p 8000:8000 -p 9443:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer-ce:latest
 }
 
-function create_virtual_env(){
-    echo "Create virtual environment at ./venv"
-    pip install virtualenv --user
-    python -m venv venv
-}
-
-function install_backup_dependencies() {
-    echo "Installing DB backup dependencies..."
-    venv/bin/pip3 install psycopg2 pandas
-}
 
 function install_ap(){
     # Install Access Point
@@ -67,13 +53,14 @@ function install_ap(){
     # Enable hostpad
     echo "Enabling hostpad service..."
     sudo systemctl unmask hostapd.service
+
+    ./network.sh -a
 }
 
 UPDATE=
 DOCKER=
 COMPOSE=
 AP=
-PYTHON=
 PORTAINER=
 
 while getopts ":acdfph" arg
@@ -89,16 +76,6 @@ do
         d)  
             UPDATE='true'
             DOCKER='true'
-            ;;
-        b) 
-            PYTHON='true'
-            ;;
-        f) 
-            UPDATE='true'
-            AP='true'
-            DOCKER='true'
-            COMPOSE='true'
-            PYTHON='true'
             ;;
         p) 
             PORTAINER='true'
@@ -139,11 +116,6 @@ fi
 if [[ -n "$COMPOSE" ]]; then
     create_virtual_env
     install_docker_compose
-fi
-
-if [[ -n "$PYTHON" ]]; then
-    create_virtual_env
-    install_backup_dependencies
 fi
 
 if [[ -n "$PORTAINER" ]]; then

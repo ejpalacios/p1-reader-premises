@@ -71,24 +71,24 @@ Poetry (version 1.5.1)
 Subsequently, one can install all the necessary dependencies by simply running
 
 ```bash
-$ poetry install
+poetry install
 ```
 
 And to activate the virtual environment just execute:
 
 ```bash
-$ poetry shell
+poetry shell
 ```
 
 Alternatively, we also provide `requirement.txt` files to create a virtual environment using other tools such as `venv`. The following commands can be use to instantiate the new virtual environment and install all dependencies.
 
 ```bash
-$ python3 -m venv .venv
-$ .venv/bin/pip install --upgrade pip
-$ .venv/bin/pip install -r requirements/prod.txt
-$ .venv/bin/pip install -r requirements/opt.txt
-$ .venv/bin/pip install -r requirements/test.txt
-$ .venv/bin/pip install -r requirements/dev.txt
+python3 -m venv .venv
+.venv/bin/pip install --upgrade pip
+.venv/bin/pip install -r requirements/prod.txt
+.venv/bin/pip install -r requirements/opt.txt
+.venv/bin/pip install -r requirements/test.txt
+.venv/bin/pip install -r requirements/dev.txt
 ```
 
 Please note that in both cases, `poetry` or `venv`, dependencies are divided into four groups
@@ -279,7 +279,7 @@ Running the utility as a docker image is straightforward.
 First, pull the latest version of the image from [dockerhub](https://hub.docker.com/r/ejpalacios/p1-reader).
 
 ```bash
-$ docker pull docker.io/ejpalacios/p1-reader
+docker pull docker.io/ejpalacios/p1-reader
 ```
 
 Then, spin up the container using the docker run command.
@@ -312,7 +312,7 @@ To bring up the deployment a three step procedure is needed.
 First, we need to create a `docker` network to be shared by the deployments.
 
 ```bash
-$ docker network create premises
+docker network create premises
 ```
 
 By default, the name of this network is `premises`. Nevertheless, a different name can be chosen, providing the `docker-compose.yml` files are edited accordingly.
@@ -320,7 +320,7 @@ By default, the name of this network is `premises`. Nevertheless, a different na
 Secondly, we need to spin up all the services with the command
 
 ```bash
-$ docker-compose -f docker/services/docker-compose.yml up -d
+docker-compose -f docker/services/docker-compose.yml up -d
 ```
 
 Here, the flag `-d` is used to detach the terminal output.
@@ -328,7 +328,7 @@ Here, the flag `-d` is used to detach the terminal output.
 Finally, once all the services are up and running, the logger utility can also be initialised.
 
 ```bash
-$ docker-compose -f docker/p1reader/docker-compose.yml up -d
+docker-compose -f docker/p1reader/docker-compose.yml up -d
 ```
 
 To verify that all services are deployed the following docker command can be used:
