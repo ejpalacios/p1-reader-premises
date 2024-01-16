@@ -1,8 +1,9 @@
 import argparse
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import cast
 
 import pandas as pd
+from dateutil.relativedelta import relativedelta
 
 import p1reader.sinks.db_operations as op
 from p1reader.sinks import DBSink, DBSinkConfig
@@ -10,17 +11,48 @@ from p1reader.sinks import DBSink, DBSinkConfig
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        conflict_handler="resolve", description="Back up from DB"
+        conflict_handler="resolve", description="Back up from DB to CSV files"
     )
-    parser.add_argument("-H", "--hostname", type=str, default="localhost")
-    parser.add_argument("-P", "--port", type=str, default=5432)
-    parser.add_argument("-D", "--database", type=str, default="premises")
-    parser.add_argument("-U", "--user", type=str, default="postgres")
-    parser.add_argument("-p", "--password", type=str, default="password")
-    parser.add_argument("-i", "--device_id", type=str)
-    parser.add_argument("-s", "--start", type=str, default=None)
-    parser.add_argument("-e", "--end", type=str, default=None)
-    parser.add_argument("-o", "--output_path", type=str, default=".")
+    parser.add_argument(
+        "-H", "--hostname", type=str, default="localhost", help="DB host"
+    )
+    parser.add_argument("-P", "--port", type=str, default=5432, help="DB port")
+    parser.add_argument(
+        "-D", "--database", type=str, default="premises", help="DB name"
+    )
+    parser.add_argument(
+        "-U", "--user", type=str, default="postgres", help="DB username"
+    )
+    parser.add_argument(
+        "-p", "--password", type=str, default="password", help="DB password"
+    )
+
+    parser.add_argument("-i", "--device_id", type=str, help="Meter identifier (EAN)")
+    parser.add_argument("-s", "--start", type=str, default=None, help="Initial date")
+    parser.add_argument("-e", "--end", type=str, default=None, help="Final date")
+    parser.add_argument(
+        "-o", "--output_path", type=str, default=".", help="Output path for CSV files"
+    )
+
+    parser.add_argument(
+        "--all", action=argparse.BooleanOptionalAction, help="Backup all data"
+    )
+    parser.add_argument(
+        "--elec", action=argparse.BooleanOptionalAction, help="Backup electricity data"
+    )
+    parser.add_argument(
+        "--mbus", action=argparse.BooleanOptionalAction, help="Backup mbus devices data"
+    )
+    parser.add_argument(
+        "--peak",
+        action=argparse.BooleanOptionalAction,
+        help="Backup peak consumption data",
+    )
+    parser.add_argument(
+        "--peak_history",
+        action=argparse.BooleanOptionalAction,
+        help="Backup peak consumption history data",
+    )
     args = parser.parse_args()
 
     HOSTNAME = args.hostname
@@ -28,10 +60,21 @@ def main() -> None:
     DB = args.database
     USER = args.user
     PASSWORD = args.password
+
     PATH = args.output_path
     DEVICE_ID = args.device_id
     START = args.start
     END = args.end
+
+    ELEC = args.elec
+    MBUS = args.mbus
+    PEAK = args.peak
+    PEAK_HISTORY = args.peak_history
+    if args.all:
+        ELEC = True
+        MBUS = True
+        PEAK = True
+        PEAK_HISTORY = True
 
     db_config = DBSinkConfig(
         host=HOSTNAME, port=PORT, database=DB, user=USER, password=PASSWORD
@@ -43,56 +86,73 @@ def main() -> None:
     if DEVICE_ID not in ids:
         raise ValueError(f"{DEVICE_ID=} not found in {ids=}")
 
-    start_date, end_date = db.query_date_range(DEVICE_ID)
+    START_DATE, END_DATE = db.query_date_range(DEVICE_ID)
     if START is not None:
-        start_date = START
+        START_DATE = datetime.fromisoformat(START)
     if END is not None:
-        end_date = END
+        END_DATE = datetime.fromisoformat(END)
 
-    if start_date is not None and end_date is not None:
-        print(f"{start_date.isoformat()}, {end_date.isoformat()}")
+    if START_DATE is not None and END_DATE is not None:
+        print(f"{START_DATE.isoformat()}, {END_DATE.isoformat()}")
     else:
         raise ValueError("No data found in database")
 
     measurements = get_measurements_list(db.query_n_phases(DEVICE_ID))
 
-    while start_date < end_date:
-        start_slice = start_date
-        end_slice = start_date + timedelta(days=30)
+    date_pointer = START_DATE
+    date_pointer = date_pointer.replace(
+        day=1, hour=0, minute=0, second=0, microsecond=0
+    )
+    while date_pointer < END_DATE:
+        start_slice = date_pointer
+        end_slice = date_pointer + relativedelta(months=1)
+
         print(f"{start_slice.isoformat()}, {end_slice.isoformat()}")
 
         # Backup electrical measurements
-        results = db.query_sql(DEVICE_ID, start_slice, end_slice, op.ELEC, measurements)
-        df_elec = dict_to_df(results, 3)
-        write_csv(df_elec, "elec", PATH, DEVICE_ID, start_slice, end_slice)
+        if ELEC:
+            results = db.query_sql(
+                DEVICE_ID, start_slice, end_slice, op.ELEC, measurements
+            )
+            df_elec = dict_to_df(results, 3)
+            write_csv(df_elec, "elec", PATH, DEVICE_ID, start_slice, end_slice)
 
         # Backup mbus measurements
-        mbus_ids = db.query_mbus_ids(DEVICE_ID)
-        if len(mbus_ids) != 0:
-            results = db.query_sql(DEVICE_ID, start_slice, end_slice, op.MBUS)
-            df_mbus = dict_to_df(results, 4)
-            write_csv(df_mbus, "mbus", PATH, DEVICE_ID, start_slice, end_slice)
+        if MBUS:
+            mbus_ids = db.query_mbus_ids(DEVICE_ID)
+            if len(mbus_ids) != 0:
+                results = db.query_sql(
+                    DEVICE_ID, start_slice, end_slice, op.MBUS, mbus_ids
+                )
+                df_mbus = dict_to_df(results, 4)
+                write_csv(df_mbus, "mbus", PATH, DEVICE_ID, start_slice, end_slice)
 
-        start_date += timedelta(days=30)
+        date_pointer += relativedelta(months=1)
 
     # Backup peak demand
-    results = db.query_sql(DEVICE_ID, start_date, end_date, op.PEAK)
-    df_peak = dict_to_df(results, 2)
-    write_csv(df_peak, "peak", PATH, DEVICE_ID, start_date, end_date)
+    if PEAK:
+        results = db.query_sql(DEVICE_ID, START_DATE, END_DATE, op.PEAK)
+        df_peak = dict_to_df(results, 2)
+        write_csv(df_peak, "peak", PATH, DEVICE_ID, START_DATE, END_DATE)
 
     # Backup peak demand history
-    results = db.query_sql(DEVICE_ID, start_date, end_date, op.PEAK_HISTORY)
-    df_peak_his = dict_to_df(results, 2)
-    write_csv(df_peak_his, "peak_history", PATH, DEVICE_ID, start_date, end_date)
+    if PEAK_HISTORY:
+        results = db.query_sql(DEVICE_ID, START_DATE, END_DATE, op.PEAK_HISTORY)
+        df_peak_his = dict_to_df(results, 3)
+        write_csv(df_peak_his, "peak_history", PATH, DEVICE_ID, START_DATE, END_DATE)
 
     value = input("Backup Completed. Would you like to deleted all data [N/y]: ")
     if value.lower().strip() == "y":
         value_confirm = input("This operation cannot be reversed are you sure [N/y]")
         if value_confirm.lower().strip() == "y":
-            db.delete_sql(DEVICE_ID, start_date, end_date, op.ELEC)
-            db.delete_sql(DEVICE_ID, start_date, end_date, op.MBUS)
-            db.delete_sql(DEVICE_ID, start_date, end_date, op.PEAK)
-            db.delete_sql(DEVICE_ID, start_date, end_date, op.PEAK_HISTORY)
+            db.delete_sql(DEVICE_ID, START_DATE, END_DATE, op.ELEC) if ELEC else None
+            db.delete_sql(DEVICE_ID, START_DATE, END_DATE, op.MBUS) if MBUS else None
+            db.delete_sql(DEVICE_ID, START_DATE, END_DATE, op.PEAK) if PEAK else None
+            db.delete_sql(
+                DEVICE_ID, START_DATE, END_DATE, op.PEAK_HISTORY
+            ) if PEAK_HISTORY else None
+
+    db.close()
 
 
 def dict_to_df(results: dict, index_value: int, index_time: int = 0) -> pd.DataFrame:

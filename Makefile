@@ -5,6 +5,7 @@ IMAGE_TAG := latest
 DOCKER_REGISTRY := docker.io/ejpalacios
 PACKAGE := p1reader
 TEST := test
+TOOLS := utils
 
 ## Create virtual environment
 .venv/bin/activate: pyproject.toml
@@ -29,15 +30,15 @@ run: .venv/bin/activate
 
 ## Sort imports
 isort: .venv/bin/activate
-	poetry run isort $(PACKAGE) $(TEST) --check-only
+	poetry run isort $(PACKAGE) $(TEST) $(TOOLS) --check-only
 
 ## Check formatting with black
 black: .venv/bin/activate
-	poetry run black $(PACKAGE) $(TEST) --check
+	poetry run black $(PACKAGE) $(TEST) $(TOOLS) --check
 
 ## Mypy static checker
 mypy: .venv/bin/activate
-	poetry run mypy $(PACKAGE) $(TEST) --install-types --non-interactive
+	poetry run mypy $(PACKAGE) $(TEST) $(TOOLS) --install-types --non-interactive
 
 ## Run tests
 test: .venv/bin/activate

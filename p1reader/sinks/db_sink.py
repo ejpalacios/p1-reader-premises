@@ -224,12 +224,10 @@ class DBSink(DataSink):
                         ).value
                     ).decode()
                     if device_type == 7:
-                        meter = "WATER"
                         reading = getattr(
                             device, f"BELGIUM_MBUS{channel}_METER_READING1"
                         )
                     elif device_type == 3:
-                        meter = "GAS"
                         reading = getattr(
                             device, f"BELGIUM_MBUS{channel}_METER_READING2"
                         )
@@ -238,7 +236,6 @@ class DBSink(DataSink):
                             reading.datetime,
                             device_id,
                             mbus_id,
-                            meter,
                             float(reading.value),
                         )
                     )
