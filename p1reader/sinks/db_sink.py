@@ -240,23 +240,25 @@ class DBSink(DataSink):
                         )
                     )
             elif name in MAXIMUM_MEASUREMENTS_ON_GOING:
-                peak.append(
-                    (
-                        val.datetime,
-                        device_id,
-                        float(val.value),
-                    )
-                )
-            elif name in MAXIMUM_MEASUREMENTS_HISTORY:
-                for entry in val:
-                    peak_history.append(
+                if val.datetime is not None:
+                    peak.append(
                         (
-                            entry.datetime,
+                            val.datetime,
                             device_id,
-                            entry.occurred,
-                            float(entry.value),
+                            float(val.value),
                         )
                     )
+            elif name in MAXIMUM_MEASUREMENTS_HISTORY:
+                for entry in val:
+                    if entry.datetime is not None:
+                        peak_history.append(
+                            (
+                                entry.datetime,
+                                device_id,
+                                entry.occurred,
+                                float(entry.value),
+                            )
+                        )
         cls.insert_sql(elec, op.ELEC)
         cls.insert_sql(mbus, op.MBUS)
         cls.insert_sql(peak, op.PEAK)
