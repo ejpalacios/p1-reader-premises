@@ -20,7 +20,7 @@ Data logger and basic visualisation tool for Belgian Smart meters
 
 - :white_check_mark: Add utilities to back up data from DB
 - Add example Jupyter Notebooks on data reading and visualisation
-- Add instructions for deployment in Raspberry Pi devices
+- :white_check_mark: Add instructions for deployment in Raspberry Pi devices
 
 ## Table of Contents
 
@@ -31,6 +31,7 @@ Data logger and basic visualisation tool for Belgian Smart meters
 5. [Docker image usage](#docker-image-usage)
 6. [Docker compose usage](#docker-compose-usage)
 7. [Data back up and restore](#data-back-up-and-restore)
+8. [Deployment to Raspberry Pi](https://github.com/ejpalacios/p1-reader-premises/blob/main/rpi-install/install_device.md)
 
 ## Prerequisites
 
