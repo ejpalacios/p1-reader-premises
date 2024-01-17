@@ -24,14 +24,14 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 2,
+  "id": 21,
   "links": [],
   "liveNow": false,
   "panels": [
     {
       "datasource": {
         "type": "postgres",
-        "uid": "p1-reader"
+        "uid": "premises"
       },
       "description": "",
       "fieldConfig": {
@@ -53,6 +53,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -89,7 +90,7 @@
       },
       "gridPos": {
         "h": 10,
-        "w": 12,
+        "w": 24,
         "x": 0,
         "y": 0
       },
@@ -110,7 +111,7 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "p1-reader"
+            "uid": "premises"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -123,7 +124,7 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "p1-reader"
+            "uid": "premises"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -141,147 +142,7 @@
     {
       "datasource": {
         "type": "postgres",
-        "uid": "p1-reader"
-      },
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "Energy",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 25,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "normal"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "decimals": 0,
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "kwatth"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 10,
-        "w": 12,
-        "x": 12,
-        "y": 0
-      },
-      "id": 5,
-      "options": {
-        "legend": {
-          "calcs": ["last"],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "pluginVersion": "8.5.5",
-      "targets": [
-        {
-          "datasource": {
-            "type": "postgres",
-            "uid": "p1-reader"
-          },
-          "editorMode": "code",
-          "format": "time_series",
-          "group": [],
-          "metricColumn": "none",
-          "rawQuery": true,
-          "rawSql": "SELECT\n  \"time\" AS \"time\",\n  value AS \"A+ T1\"\nFROM elec_measurement\nWHERE\n  $__timeFilter(\"time\") AND\n  obis_name = 'A+(T1)' AND\n  device_id = '$METERS' \nORDER BY 1",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "postgres",
-            "uid": "p1-reader"
-          },
-          "editorMode": "code",
-          "format": "time_series",
-          "group": [],
-          "hide": false,
-          "metricColumn": "none",
-          "rawQuery": true,
-          "rawSql": "SELECT\n  \"time\" AS \"time\",\n  value AS \"A+ T2\"\nFROM elec_measurement\nWHERE\n  $__timeFilter(\"time\") AND\n  obis_name = 'A+(T2)' AND\n  device_id = '$METERS' \nORDER BY 1",
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "postgres",
-            "uid": "p1-reader"
-          },
-          "editorMode": "code",
-          "format": "time_series",
-          "group": [],
-          "hide": false,
-          "metricColumn": "none",
-          "rawQuery": true,
-          "rawSql": "SELECT\n  \"time\" AS \"time\",\n  -value AS \"A- T1\"\nFROM elec_measurement\nWHERE\n  $__timeFilter(\"time\") AND\n  obis_name = 'A-(T1)' AND\n  device_id = '$METERS' \nORDER BY 1",
-          "refId": "C"
-        },
-        {
-          "datasource": {
-            "type": "postgres",
-            "uid": "p1-reader"
-          },
-          "editorMode": "code",
-          "format": "time_series",
-          "group": [],
-          "hide": false,
-          "metricColumn": "none",
-          "rawQuery": true,
-          "rawSql": "SELECT\n  \"time\" AS \"time\",\n  -value AS \"A- T2\"\nFROM elec_measurement\nWHERE\n  $__timeFilter(\"time\") AND\n  obis_name = 'A-(T2)' AND\n  device_id = '$METERS' \nORDER BY 1",
-          "refId": "D"
-        }
-      ],
-      "title": "Energy",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "postgres",
-        "uid": "p1-reader"
+        "uid": "premises"
       },
       "description": "",
       "fieldConfig": {
@@ -303,6 +164,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -338,8 +200,8 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 10,
-        "w": 12,
+        "h": 9,
+        "w": 24,
         "x": 0,
         "y": 10
       },
@@ -360,7 +222,7 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "p1-reader"
+            "uid": "premises"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -373,7 +235,7 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "p1-reader"
+            "uid": "premises"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -387,7 +249,7 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "p1-reader"
+            "uid": "premises"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -405,7 +267,7 @@
     {
       "datasource": {
         "type": "postgres",
-        "uid": "p1-reader"
+        "uid": "premises"
       },
       "description": "",
       "fieldConfig": {
@@ -427,6 +289,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -463,10 +326,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 10,
-        "w": 12,
-        "x": 12,
-        "y": 10
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 19
       },
       "id": 3,
       "options": {
@@ -485,7 +348,7 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "p1-reader"
+            "uid": "premises"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -498,7 +361,7 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "p1-reader"
+            "uid": "premises"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -512,7 +375,7 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "p1-reader"
+            "uid": "premises"
           },
           "editorMode": "code",
           "format": "time_series",
@@ -530,20 +393,20 @@
   ],
   "refresh": "10s",
   "revision": 1,
-  "schemaVersion": 37,
+  "schemaVersion": 38,
   "style": "dark",
   "tags": [],
   "templating": {
     "list": [
       {
         "current": {
-          "selected": false,
-          "text": "7FLO2118000152",
-          "value": "7FLO2118000152"
+          "selected": true,
+          "text": "1SAG1100000292",
+          "value": "1SAG1100000292"
         },
         "datasource": {
           "type": "postgres",
-          "uid": "p1-reader"
+          "uid": "premises"
         },
         "definition": "SELECT DISTINCT(device_id) FROM elec_measurement;",
         "hide": 0,
@@ -569,6 +432,6 @@
   "timezone": "",
   "title": "Measurement logger",
   "uid": "4Nh3kDC7k",
-  "version": 3,
+  "version": 2,
   "weekStart": ""
 }

@@ -24,14 +24,29 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 1,
+  "id": 20,
   "links": [],
   "liveNow": false,
   "panels": [
     {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 4,
+      "panels": [],
+      "repeat": "MBUS",
+      "repeatDirection": "h",
+      "title": "M-Bus",
+      "type": "row"
+    },
+    {
       "datasource": {
         "type": "postgres",
-        "uid": "p1-reader"
+        "uid": "premises"
       },
       "fieldConfig": {
         "defaults": {
@@ -43,7 +58,7 @@
             "axisColorMode": "text",
             "axisLabel": "",
             "axisPlacement": "auto",
-            "brAlignment": 0,
+            "barAlignment": 0,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -52,6 +67,7 @@
               "tooltip": false,
               "viz": false
             },
+            "insertNulls": false,
             "lineInterpolation": "linear",
             "lineWidth": 1,
             "pointSize": 5,
@@ -89,7 +105,7 @@
         "h": 13,
         "w": 24,
         "x": 0,
-        "y": 0
+        "y": 1
       },
       "id": 2,
       "options": {
@@ -108,12 +124,12 @@
         {
           "datasource": {
             "type": "postgres",
-            "uid": "p1-reader"
+            "uid": "premises"
           },
           "editorMode": "code",
           "format": "table",
           "rawQuery": true,
-          "rawSql": "SELECT\n  \"time\" AS \"time\",\n  value AS \"Monthly Peak\"\nFROM mbus_measurement \nWHERE\n  $__timeFilter(\"time\") AND\n  device_id = '$METERS' AND\n  mbus_type = 'GAS'\nORDER BY 1",
+          "rawSql": "SELECT\n  \"time\" AS \"time\",\n  value AS \"Monthly Peak\"\nFROM mbus_measurement \nWHERE\n  $__timeFilter(\"time\") AND\n  device_id = '$METERS' AND\n  mbus_id = '$MBUS'\nORDER BY 1",
           "refId": "A",
           "sql": {
             "columns": [
@@ -134,122 +150,13 @@
           }
         }
       ],
-      "title": "Gas Meter: $GAS",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "postgres",
-        "uid": "p1-reader"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 14,
-        "w": 24,
-        "x": 0,
-        "y": 13
-      },
-      "id": 3,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "postgres",
-            "uid": "p1-reader"
-          },
-          "editorMode": "code",
-          "format": "table",
-          "rawQuery": true,
-          "rawSql": "SELECT\n  \"time\" AS \"time\",\n  value AS \"Monthly Peak\"\nFROM mbus_measurement \nWHERE\n  $__timeFilter(\"time\") AND\n  device_id = '$METERS' AND\n  mbus_type = 'WATER'\nORDER BY 1",
-          "refId": "A",
-          "sql": {
-            "columns": [
-              {
-                "parameters": [],
-                "type": "function"
-              }
-            ],
-            "groupBy": [
-              {
-                "property": {
-                  "type": "string"
-                },
-                "type": "groupBy"
-              }
-            ],
-            "limit": 50
-          }
-        }
-      ],
-      "title": "Water Meter: $WATER",
+      "title": "M-bus meter: $MBUS",
       "type": "timeseries"
     }
   ],
   "refresh": "",
   "revision": 1,
-  "schemaVersion": 37,
+  "schemaVersion": 38,
   "style": "dark",
   "tags": [],
   "templating": {
@@ -257,12 +164,12 @@
       {
         "current": {
           "selected": false,
-          "text": "7FLO2118000152",
-          "value": "7FLO2118000152"
+          "text": "1SAG1100000292",
+          "value": "1SAG1100000292"
         },
         "datasource": {
           "type": "postgres",
-          "uid": "p1-reader"
+          "uid": "premises"
         },
         "definition": "SELECT DISTINCT(device_id) FROM mbus_measurement;",
         "description": "",
@@ -287,41 +194,16 @@
         },
         "datasource": {
           "type": "postgres",
-          "uid": "p1-reader"
+          "uid": "premises"
         },
-        "definition": "SELECT DISTINCT(mbus_id) FROM mbus_measurement WHERE device_id = '$METERS' and mbus_type = 'GAS'",
-        "hide": 2,
+        "definition": "SELECT DISTINCT(mbus_id) FROM mbus_measurement WHERE device_id = '$METERS'",
+        "hide": 0,
         "includeAll": false,
-        "label": "Gas Meter",
+        "label": "M-bus meters",
         "multi": false,
-        "name": "GAS",
+        "name": "MBUS",
         "options": [],
-        "query": "SELECT DISTINCT(mbus_id) FROM mbus_measurement WHERE device_id = '$METERS' and mbus_type = 'GAS'",
-        "refresh": 2,
-        "regex": "",
-        "skipUrlSync": false,
-        "sort": 0,
-        "type": "query"
-      },
-      {
-        "current": {
-          "isNone": true,
-          "selected": false,
-          "text": "None",
-          "value": ""
-        },
-        "datasource": {
-          "type": "postgres",
-          "uid": "p1-reader"
-        },
-        "definition": "SELECT DISTINCT(mbus_id) FROM mbus_measurement WHERE device_id = '$METERS' and mbus_type = 'WATER'",
-        "hide": 2,
-        "includeAll": false,
-        "label": "Water Meter",
-        "multi": false,
-        "name": "WATER",
-        "options": [],
-        "query": "SELECT DISTINCT(mbus_id) FROM mbus_measurement WHERE device_id = '$METERS' and mbus_type = 'WATER'",
+        "query": "SELECT DISTINCT(mbus_id) FROM mbus_measurement WHERE device_id = '$METERS'",
         "refresh": 2,
         "regex": "",
         "skipUrlSync": false,
@@ -331,13 +213,13 @@
     ]
   },
   "time": {
-    "from": "now-2d",
+    "from": "now-1y",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Gas & Water Logger",
   "uid": "PmbEh9BVz",
-  "version": 2,
+  "version": 4,
   "weekStart": ""
 }
