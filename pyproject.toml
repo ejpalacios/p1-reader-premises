@@ -42,7 +42,7 @@ pytest-coverage = "^0.0"
 
 
 [tool.poetry.group.dev.dependencies]
-black = "^23.11.0"
+black = "^24.4.2"
 isort = "^5.12.0"
 mypy = "^1.6.1"
 python-dotenv = "^1.0.0"
