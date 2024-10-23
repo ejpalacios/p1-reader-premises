@@ -42,7 +42,7 @@ mypy: .venv/bin/activate
 
 ## Run tests
 test: .venv/bin/activate
-	poetry run pytest --cov=$(PACKAGE) -v
+	poetry run pytest --cov=$(PACKAGE) -v --cov-report term-missing
 
 ## Run local CI
 local-ci: isort black mypy test

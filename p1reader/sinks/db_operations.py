@@ -1,7 +1,6 @@
 CREATE = "CREATE"
 HYPER = "HYPER"
 INSERT = "INSERT"
-TEMPLATE = "TEMPLATE"
 READ = "READ"
 DELETE = "DELETE"
 
@@ -15,8 +14,7 @@ ELEC = {
         PRIMARY KEY (time, device_id, obis_name)
     );""",
     HYPER: "SELECT create_hypertable('elec_measurement', 'time', if_not_exists => TRUE);",
-    INSERT: "INSERT INTO elec_measurement (time, device_id, obis_name, value) VALUES %s ON CONFLICT DO NOTHING;",
-    TEMPLATE: "(%s, %s, %s, %s)",
+    INSERT: "INSERT INTO elec_measurement (time, device_id, obis_name, value) VALUES (%s, %s, %s, %s) ON CONFLICT DO NOTHING;",
     READ: """
         SELECT * FROM elec_measurement 
         WHERE device_id = %s AND
@@ -37,8 +35,7 @@ MBUS = {
         PRIMARY KEY (time, device_id, mbus_id)
     );""",
     HYPER: "SELECT create_hypertable('mbus_measurement', 'time', if_not_exists => TRUE);",
-    INSERT: "INSERT INTO mbus_measurement (time, device_id, mbus_id, value) VALUES %s ON CONFLICT DO NOTHING;",
-    TEMPLATE: "(%s, %s, %s, %s)",
+    INSERT: "INSERT INTO mbus_measurement (time, device_id, mbus_id, value) VALUES (%s, %s, %s, %s) ON CONFLICT DO NOTHING;",
     READ: """
         SELECT * FROM mbus_measurement 
         WHERE device_id = %s AND
@@ -59,8 +56,7 @@ PEAK = {
         PRIMARY KEY (time, device_id)
     );""",
     HYPER: "SELECT create_hypertable('peak_demand', 'time', if_not_exists => TRUE);",
-    INSERT: "INSERT INTO peak_demand (time, device_id, value) VALUES %s ON CONFLICT DO NOTHING;",
-    TEMPLATE: "(%s, %s, %s)",
+    INSERT: "INSERT INTO peak_demand (time, device_id, value) VALUES (%s, %s, %s) ON CONFLICT DO NOTHING;",
     READ: """
         SELECT * FROM peak_demand 
         WHERE device_id = %s AND
@@ -81,8 +77,7 @@ PEAK_HISTORY = {
         PRIMARY KEY (time, device_id)
     );""",
     HYPER: "SELECT create_hypertable('peak_demand_history', 'time', if_not_exists => TRUE);",
-    INSERT: "INSERT INTO peak_demand_history (time, device_id, occurred, value) VALUES %s ON CONFLICT DO NOTHING;",
-    TEMPLATE: "(%s, %s, %s, %s)",
+    INSERT: "INSERT INTO peak_demand_history (time, device_id, occurred, value) VALUES (%s, %s, %s, %s) ON CONFLICT DO NOTHING;",
     READ: """
         SELECT * FROM peak_demand_history 
         WHERE device_id = %s AND

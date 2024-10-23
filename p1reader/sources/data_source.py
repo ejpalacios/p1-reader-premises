@@ -1,4 +1,4 @@
-from abc import abstractmethod, abstractproperty
+from abc import abstractproperty
 from typing import Union
 
 from dsmr_parser.clients import SerialReader

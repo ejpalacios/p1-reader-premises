@@ -1,6 +1,5 @@
 from pathlib import Path
 
-import pytest
 from dsmr_parser.clients import SerialReader
 from dsmr_parser.clients.filereader import FileReader
 from dsmr_parser.telegram_specifications import BELGIUM_FLUVIUS

@@ -1,16 +1,7 @@
-from typing import Optional
-
+import paho.mqtt.client as mqtt
 from dsmr_parser import obis_references
 from dsmr_parser.objects import Telegram
-from paho.mqtt.client import Client
 
-from p1reader.sinks.config import (
-    ELECTRICITY_MEASUREMENTS,
-    MAXIMUM_MEASUREMENTS_HISTORY,
-    MAXIMUM_MEASUREMENTS_ON_GOING,
-    MBUS_MEASUREMENTS,
-    TZ_LOCAL,
-)
 from p1reader.sinks.data_sink import DataSink, DataSinkConfig
 
 
@@ -26,7 +17,7 @@ class MQTTSinkConfig(DataSinkConfig):
 
 class MQTTSink(DataSink):
     def __init__(self, host: str, port: int, qos: int) -> None:
-        self._mqtt = Client()
+        self._mqtt = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)  # type: ignore
         self._mqtt.connect(host=host, port=port)
         self._qos = qos
         self._mqtt.loop_start()

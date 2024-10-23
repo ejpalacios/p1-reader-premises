@@ -148,9 +148,11 @@ def main() -> None:
             db.delete_sql(DEVICE_ID, START_DATE, END_DATE, op.ELEC) if ELEC else None
             db.delete_sql(DEVICE_ID, START_DATE, END_DATE, op.MBUS) if MBUS else None
             db.delete_sql(DEVICE_ID, START_DATE, END_DATE, op.PEAK) if PEAK else None
-            db.delete_sql(
-                DEVICE_ID, START_DATE, END_DATE, op.PEAK_HISTORY
-            ) if PEAK_HISTORY else None
+            (
+                db.delete_sql(DEVICE_ID, START_DATE, END_DATE, op.PEAK_HISTORY)
+                if PEAK_HISTORY
+                else None
+            )
 
     db.close()
 

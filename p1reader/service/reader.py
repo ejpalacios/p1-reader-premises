@@ -3,7 +3,6 @@ from typing import Optional, Union
 
 from dsmr_parser.clients import SerialReader
 from dsmr_parser.clients.filereader import FileReader
-from pydantic import BaseModel
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from p1reader.service.service import Service
@@ -75,7 +74,7 @@ class ReaderService(Service):
                 for output_stream in self._output_streams:
                     output_stream.process_telegram(telegram)
         except KeyboardInterrupt:
-            LOGGER.info(f"Stopped reading telegrams")
+            LOGGER.info("Stopped reading telegrams")
         except UnicodeDecodeError as e:
             LOGGER.error(f"Decoding Error: {e}")
         except Exception as e:

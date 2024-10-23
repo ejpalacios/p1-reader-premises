@@ -1,10 +1,8 @@
-from pathlib import Path
-
 import pytest
 from dsmr_parser.clients import SerialReader
 from dsmr_parser.clients.filereader import FileReader
 
-from p1reader.service import ReaderService, ReaderServiceConfig
+from p1reader.service import ReaderServiceConfig
 from p1reader.sinks import ScreenSink
 from p1reader.sources import FileSourceConfig, PortSourceConfig
 

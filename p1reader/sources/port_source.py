@@ -1,5 +1,3 @@
-from typing import Optional
-
 from dsmr_parser.clients import SERIAL_SETTINGS_V5, SerialReader
 from dsmr_parser.telegram_specifications import BELGIUM_FLUVIUS
 
