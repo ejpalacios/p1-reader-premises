@@ -39,7 +39,7 @@ class DBSink(DataSink):
     def __init__(self, connection_uri: Optional[str] = None) -> None:
         if connection_uri:
             print(connection_uri)
-            DBSink._pool = ConnectionPool(conninfo=connection_uri, open=True)
+            DBSink._pool = ConnectionPool(conninfo=connection_uri, open=True, check=ConnectionPool.check_connection)
             self.create_tables()
         else:
             raise ValueError("Connection URI has not been set yet")

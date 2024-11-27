@@ -1,4 +1,5 @@
 import argparse
+import time
 from datetime import datetime
 from typing import cast
 
@@ -82,9 +83,9 @@ def main() -> None:
 
     db = cast(DBSink, db_config.output_stream)
 
-    ids = db.query_meter_ids()
-    if DEVICE_ID not in ids:
-        raise ValueError(f"{DEVICE_ID=} not found in {ids=}")
+    # ids = db.query_meter_ids()
+    # if DEVICE_ID not in ids:
+    #     raise ValueError(f"{DEVICE_ID=} not found in {ids=}")
 
     START_DATE, END_DATE = db.query_date_range(DEVICE_ID)
     if START is not None:
@@ -107,14 +108,39 @@ def main() -> None:
         start_slice = date_pointer
         end_slice = date_pointer + relativedelta(months=1)
 
-        print(f"{start_slice.isoformat()}, {end_slice.isoformat()}")
+        print(f"Saving month: {start_slice.isoformat()}, {end_slice.isoformat()}")
 
         # Backup electrical measurements
+        df_elec = pd.DataFrame()
         if ELEC:
-            results = db.query_sql(
-                DEVICE_ID, start_slice, end_slice, op.ELEC, measurements
-            )
-            df_elec = dict_to_df(results, 3)
+            day_pointer = start_slice
+            error_count = 0
+            # Daily query to avoid overloading the raspberry pi
+            while day_pointer < end_slice:
+                start_day_slice = day_pointer
+                end_day_slice = day_pointer + relativedelta(days=1) - relativedelta(seconds=1)
+                print(f"Saving day: {start_day_slice.isoformat()}, {end_day_slice.isoformat()}")
+                try:
+                    results = db.query_sql(
+                        DEVICE_ID, start_day_slice, end_day_slice, op.ELEC, measurements
+                    )
+                except Exception as e:
+                    print(e)
+                    error_count += 1
+                    db.close()
+                    print(f"Trying to reconnect in 60 seconds after {error_count} attempts")
+                    time.sleep(60)
+                    db_config = DBSinkConfig(
+                        host=HOSTNAME, port=PORT, database=DB, user=USER, password=PASSWORD
+                    )
+                    db = cast(DBSink, db_config.output_stream)
+                    if error_count > 2:
+                        day_pointer += relativedelta(days=1)
+                        error_count = 0
+                    continue
+                df_elec_part = dict_to_df(results, 3)
+                df_elec = pd.concat([df_elec, df_elec_part])
+                day_pointer += relativedelta(days=1)
             write_csv(df_elec, "elec", PATH, DEVICE_ID, start_slice, end_slice)
 
         # Backup mbus measurements
@@ -124,7 +150,7 @@ def main() -> None:
                 results = db.query_sql(
                     DEVICE_ID, start_slice, end_slice, op.MBUS, mbus_ids
                 )
-                df_mbus = dict_to_df(results, 4)
+                df_mbus = dict_to_df(results, 3)
                 write_csv(df_mbus, "mbus", PATH, DEVICE_ID, start_slice, end_slice)
 
         date_pointer += relativedelta(months=1)
