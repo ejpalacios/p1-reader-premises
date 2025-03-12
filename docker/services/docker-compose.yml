@@ -18,7 +18,7 @@ services:
       - ./mosquitto:/mosquitto/config:Z
 
   timescaledb:
-    image: docker.io/timescale/timescaledb:latest-pg14
+    image: docker.io/timescale/timescaledb:2.18.1-pg17
     hostname: timescaledb
     networks:
       - premises
