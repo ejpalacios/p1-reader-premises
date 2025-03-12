@@ -118,8 +118,12 @@ def main() -> None:
             # Daily query to avoid overloading the raspberry pi
             while day_pointer < end_slice:
                 start_day_slice = day_pointer
-                end_day_slice = day_pointer + relativedelta(days=1) - relativedelta(seconds=1)
-                print(f"Saving day: {start_day_slice.isoformat()}, {end_day_slice.isoformat()}")
+                end_day_slice = (
+                    day_pointer + relativedelta(days=1) - relativedelta(seconds=1)
+                )
+                print(
+                    f"Saving day: {start_day_slice.isoformat()}, {end_day_slice.isoformat()}"
+                )
                 try:
                     results = db.query_sql(
                         DEVICE_ID, start_day_slice, end_day_slice, op.ELEC, measurements
@@ -128,10 +132,16 @@ def main() -> None:
                     print(e)
                     error_count += 1
                     db.close()
-                    print(f"Trying to reconnect in 60 seconds after {error_count} attempts")
+                    print(
+                        f"Trying to reconnect in 60 seconds after {error_count} attempts"
+                    )
                     time.sleep(60)
                     db_config = DBSinkConfig(
-                        host=HOSTNAME, port=PORT, database=DB, user=USER, password=PASSWORD
+                        host=HOSTNAME,
+                        port=PORT,
+                        database=DB,
+                        user=USER,
+                        password=PASSWORD,
                     )
                     db = cast(DBSink, db_config.output_stream)
                     if error_count > 2:

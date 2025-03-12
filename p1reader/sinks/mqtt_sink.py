@@ -17,7 +17,7 @@ class MQTTSinkConfig(DataSinkConfig):
 
 class MQTTSink(DataSink):
     def __init__(self, host: str, port: int, qos: int) -> None:
-        self._mqtt = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)  # type: ignore
+        self._mqtt = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
         self._mqtt.connect(host=host, port=port)
         self._qos = qos
         self._mqtt.loop_start()
