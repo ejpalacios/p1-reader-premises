@@ -56,7 +56,7 @@ docker-push: docker-build
 
 ## Clean files
 clean:
-	rm -f requirements.txt
+	rm -rf  requirements/*.txt
 	rm -rf .mypy_cache
 	rm -rf .pytest_cache
 	rm -rf .venv
