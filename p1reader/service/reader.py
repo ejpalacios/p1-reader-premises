@@ -1,5 +1,4 @@
 import logging
-from typing import Optional, Union
 
 from dsmr_parser.clients import SerialReader
 from dsmr_parser.clients.filereader import FileReader
@@ -21,14 +20,14 @@ LOGGER = logging.getLogger(__name__)
 class ReaderServiceConfig(BaseSettings):
     model_config = SettingsConfigDict(env_nested_delimiter="__")
 
-    db: Optional[DBSinkConfig] = None
-    mqtt: Optional[MQTTSinkConfig] = None
-    dump: Optional[FileSinkConfig] = None
-    port: Optional[PortSourceConfig] = None
-    file: Optional[FileSourceConfig] = None
+    db: DBSinkConfig | None = None
+    mqtt: MQTTSinkConfig | None = None
+    dump: FileSinkConfig | None = None
+    port: PortSourceConfig | None = None
+    file: FileSourceConfig | None = None
 
     @property
-    def input_stream(self) -> Union[FileReader, SerialReader]:
+    def input_stream(self) -> FileReader | SerialReader:
         input = None
         if self.port is not None:
             LOGGER.debug(f"Using port source {self.port}")
@@ -58,7 +57,7 @@ class ReaderServiceConfig(BaseSettings):
 class ReaderService(Service):
     def __init__(
         self,
-        input_stream: Union[FileReader, SerialReader],
+        input_stream: FileReader | SerialReader,
         output_streams: list[DataSink],
     ) -> None:
         self._input_stream = input_stream

@@ -1,5 +1,4 @@
 from abc import abstractproperty
-from typing import Union
 
 from dsmr_parser.clients import SerialReader
 from dsmr_parser.clients.filereader import FileReader
@@ -10,7 +9,7 @@ class DataSource(BaseModel):
     """Base class for data sources"""
 
     @abstractproperty
-    def input_stream(self) -> Union[SerialReader, FileReader]:
+    def input_stream(self) -> SerialReader | FileReader:
         """
         Instance of the input stream of the data  source
 

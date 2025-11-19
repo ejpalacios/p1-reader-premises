@@ -28,24 +28,22 @@ requirements/opt.txt: pyproject.toml
 run: .venv/bin/activate
 	poetry run python -m $(PACKAGE) --config config.yaml
 
-## Sort imports
-isort: .venv/bin/activate
-	poetry run isort $(PACKAGE) $(TEST) $(TOOLS) --check-only
-
-## Check formatting with black
-black: .venv/bin/activate
-	poetry run black $(PACKAGE) $(TEST) $(TOOLS) --check
-
 ## Mypy static checker
+.PHONY: mypy
 mypy: .venv/bin/activate
 	poetry run mypy $(PACKAGE) $(TEST) $(TOOLS) --install-types --non-interactive
+
+## Ruff lint
+.PHONY: ruff
+ruff: .venv/bin/activate
+	poetry run ruff check $(PACKAGE) $(TEST) $(TOOLS)
 
 ## Run tests
 test: .venv/bin/activate
 	poetry run pytest --cov=$(PACKAGE) -v --cov-report term-missing
 
 ## Run local CI
-local-ci: isort black mypy test
+local-ci: ruff mypy test
 
 docker-build: requirements/prod.txt
 	docker build -t $(DOCKER_REGISTRY)/$(IMAGE_NAME):$(IMAGE_TAG) . 

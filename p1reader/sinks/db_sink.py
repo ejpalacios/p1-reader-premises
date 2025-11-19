@@ -1,6 +1,5 @@
 import logging
 from datetime import datetime
-from typing import Optional
 
 import psycopg
 from dsmr_parser import obis_references
@@ -36,7 +35,7 @@ class DBSinkConfig(DataSinkConfig):
 class DBSink(DataSink):
     _pool: ConnectionPool
 
-    def __init__(self, connection_uri: Optional[str] = None) -> None:
+    def __init__(self, connection_uri: str | None = None) -> None:
         if connection_uri:
             print(connection_uri)
             DBSink._pool = ConnectionPool(
@@ -62,20 +61,18 @@ class DBSink(DataSink):
 
     @classmethod
     def create_table_sql(cls, sql_collection: dict) -> None:
-        with cls._pool.connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute(sql_collection[op.CREATE])
-                cur.execute(sql_collection[op.HYPER])
+        with cls._pool.connection() as conn, conn.cursor() as cur:
+            cur.execute(sql_collection[op.CREATE])
+            cur.execute(sql_collection[op.HYPER])
 
     @classmethod
     def insert_sql(cls, measurements: list, sql_collection: dict) -> None:
         try:
-            with cls._pool.connection() as conn:
-                with conn.cursor() as cur:
-                    cur.executemany(
-                        sql_collection[op.INSERT],
-                        measurements,
-                    )
+            with cls._pool.connection() as conn, conn.cursor() as cur:
+                cur.executemany(
+                    sql_collection[op.INSERT],
+                    measurements,
+                )
         except psycopg.Error as e:
             LOGGER.warning(f"Failed to insert rows.\n ERROR: {e}")
 
@@ -86,25 +83,24 @@ class DBSink(DataSink):
         start_date: datetime,
         end_date: datetime,
         sql_collection: dict,
-        measurements: Optional[list] = None,
+        measurements: list | None = None,
     ) -> dict:
         values: dict = dict()
-        with cls._pool.connection() as conn:
-            with conn.cursor() as cur:
-                if measurements is not None:
-                    for measure in measurements:
-                        values[measure] = []
-                        cur.execute(
-                            sql_collection[op.READ],
-                            (device_id, measure, start_date, end_date),
-                        )
-                        values[measure] = cur.fetchall()
-                else:
+        with cls._pool.connection() as conn, conn.cursor() as cur:
+            if measurements is not None:
+                for measure in measurements:
+                    values[measure] = []
                     cur.execute(
                         sql_collection[op.READ],
-                        (device_id, start_date, end_date),
+                        (device_id, measure, start_date, end_date),
                     )
-                    values["Default"] = cur.fetchall()
+                    values[measure] = cur.fetchall()
+            else:
+                cur.execute(
+                    sql_collection[op.READ],
+                    (device_id, start_date, end_date),
+                )
+                values["Default"] = cur.fetchall()
         return values
 
     @classmethod
@@ -116,12 +112,11 @@ class DBSink(DataSink):
         sql_collection: dict,
     ) -> dict:
         values: dict = dict()
-        with cls._pool.connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute(
-                    sql_collection[op.DELETE],
-                    (device_id, start_date, end_date),
-                )
+        with cls._pool.connection() as conn, conn.cursor() as cur:
+            cur.execute(
+                sql_collection[op.DELETE],
+                (device_id, start_date, end_date),
+            )
         return values
 
     @classmethod
@@ -130,12 +125,11 @@ class DBSink(DataSink):
             SELECT DISTINCT(device_id) FROM elec_measurement LIMIT 1000;
         """
         ids = []
-        with cls._pool.connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute(query_ids)
-                result = cur.fetchall()
-                for id_i in result:
-                    ids.append(id_i[0])
+        with cls._pool.connection() as conn, conn.cursor() as cur:
+            cur.execute(query_ids)
+            result = cur.fetchall()
+            for id_i in result:
+                ids.append(id_i[0])
         return ids
 
     @classmethod
@@ -144,29 +138,27 @@ class DBSink(DataSink):
             SELECT DISTINCT(mbus_id) FROM mbus_measurement WHERE device_id = %s ;
         """
         ids = []
-        with cls._pool.connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute(query_ids, [device_id])
-                result = cur.fetchall()
-                for id_i in result:
-                    ids.append(id_i[0])
+        with cls._pool.connection() as conn, conn.cursor() as cur:
+            cur.execute(query_ids, [device_id])
+            result = cur.fetchall()
+            for id_i in result:
+                ids.append(id_i[0])
         return ids
 
     @classmethod
     def query_date_range(
         cls, device_id: str
-    ) -> tuple[Optional[datetime], Optional[datetime]]:
+    ) -> tuple[datetime | None, datetime | None]:
         query_range = """
             SELECT min(time), max(time) FROM elec_measurement WHERE device_id = %s;
         """
-        start_date: Optional[datetime]
-        end_date: Optional[datetime]
-        with cls._pool.connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute(query_range, [device_id])
-                result = cur.fetchall()
-                start_date = result[0][0]
-                end_date = result[0][1]
+        start_date: datetime | None
+        end_date: datetime | None
+        with cls._pool.connection() as conn, conn.cursor() as cur:
+            cur.execute(query_range, [device_id])
+            result = cur.fetchall()
+            start_date = result[0][0]
+            end_date = result[0][1]
         return start_date, end_date
 
     @classmethod
@@ -176,12 +168,11 @@ class DBSink(DataSink):
             WHERE device_id = %s AND obis_name = 'P+(L3)' LIMIT 10;
         """
         phases = 1
-        with cls._pool.connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute(query_phase, [device_id])
-                result = cur.fetchall()
-                if len(result) != 0:
-                    phases = 3
+        with cls._pool.connection() as conn, conn.cursor() as cur:
+            cur.execute(query_phase, [device_id])
+            result = cur.fetchall()
+            if len(result) != 0:
+                phases = 3
         return phases
 
     @classmethod
@@ -196,7 +187,7 @@ class DBSink(DataSink):
             telegram[obis_references.BELGIUM_EQUIPMENT_IDENTIFIER].value
         ).decode()
         for name, val in telegram:
-            if name in ELECTRICITY_MEASUREMENTS.keys():
+            if name in ELECTRICITY_MEASUREMENTS:
                 elec.append(
                     (dt, device_id, ELECTRICITY_MEASUREMENTS[name], float(val.value))
                 )
@@ -204,9 +195,9 @@ class DBSink(DataSink):
                 for device in val:
                     print(device)
                     mbus_id = bytearray.fromhex(
-                        getattr(device, "MBUS_EQUIPMENT_IDENTIFIER").value
+                        device.MBUS_EQUIPMENT_IDENTIFIER.value
                     ).decode()
-                    reading = getattr(device, "MBUS_METER_READING")
+                    reading = device.MBUS_METER_READING
                     mbus.append(
                         (
                             reading.datetime,

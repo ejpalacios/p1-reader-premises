@@ -1,60 +1,66 @@
-[tool.mypy]
-disallow_untyped_defs = true
-warn_unused_ignores = true
-show_error_codes = true
+[project]
+name = "p1reader"
+version = "0.1.0"
+description = "P1 service utility for Belgian Smart Meters"
+authors = [
+    {name = "Emilio J. Palacios-Garcia",email = "emiliojose.palaciosgarcia@kuleuven.be"}
+]
+license = {text = "GLP-3.0"}
+readme = "README.md"
+requires-python = ">=3.14,<4"
+dependencies = [
+    "pydantic (>=2.12.4,<3.0.0)",
+    "pytz (>=2025.2,<2026.0)",
+    "dsmr-parser (>=1.4.3,<2.0.0)",
+    "paho-mqtt (>=2.1.0,<3.0.0)",
+    "pyyaml (>=6.0.3,<7.0.0)",
+    "argparse (>=1.4.0,<2.0.0)",
+    "pydantic-settings (>=2.12.0,<3.0.0)",
+    "python-dateutil (>=2.9.0.post0,<3.0.0)",
+    "psycopg[binary,pool] (>=3.2.12,<4.0.0)",
+    "cryptography (>=46.0.3,<47.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "pytest (>=9.0.1,<10.0.0)",
+    "pytest-coverage (>=0.0,<0.1)",
+    "ruff (>=0.14.5,<0.15.0)",
+    "python-dotenv (>=1.2.1,<2.0.0)",
+    "mypy (>=1.18.2,<2.0.0)"
+]
+opt = [
+    "jupyterlab (>=4.5.0,<5.0.0)",
+    "pandas (>=2.3.3,<3.0.0)",
+    "matplotlib (>=3.10.7,<4.0.0)",
+    "ipympl (>=0.9.8,<0.10.0)"
+]
+
+[tool.ruff.lint]
+select = [
+    "E", # pycodestyle
+    "F", # Pyflakes
+    "UP", # pyupgrade
+    "B", # flake8-bugbear
+    "SIM", # flake8-simplify
+    "I", # isort
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.format]
+docstring-code-format = true
+docstring-code-line-length = 20
 
 [[tool.mypy.overrides]]
 ignore_missing_imports = true
-module = [
-    "dsmr_parser.*",
-]
-
-[tool.isort]
-profile = "black"
-
-[tool.coverage.run]
-omit = ["*/test*", "*__init__*"]
-
-[tool.poetry]
-name = "p1-reader"
-version = "0.1.0"
-description = "P1 service utility for Belgian Smart Meters"
-authors = ["Emilio J. Palacios-Garcia <emiliojose.palaciosgarcia@kuleuven.be>"]
-readme = "README.md"
-packages = [{include = "p1reader"}]
-
-[tool.poetry.dependencies]
-python = ">3.9.1,<4.0"
-pydantic = "^2.4.2"
-pytz = "^2025.1"
-dsmr-parser = "^1.4.3"
-paho-mqtt = "^2.1.0"
-pyyaml = "^6.0"
-argparse = "^1.4.0"
-pydantic-settings = "^2.0.1"
-python-dateutil = "^2.8.2"
-psycopg = {extras = ["binary", "pool"], version = "^3.2.3"}
-cryptography = "^44.0.1"
-
-
-[tool.poetry.group.test.dependencies]
-pytest = "^8.3.3"
-pytest-coverage = "^0.0"
-
-
-[tool.poetry.group.dev.dependencies]
-black = "^25.1.0"
-isort = "^6.0.0"
-mypy = "^1.6.1"
-python-dotenv = "^1.0.0"
-
-
-[tool.poetry.group.opt.dependencies]
-jupyterlab = "^4.4.1"
-pandas = "^2.0.2"
-matplotlib = "^3.8.0"
-ipympl = "^0.9.3"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+module = ["dsmr_parser.*", "psycopg_pool"]

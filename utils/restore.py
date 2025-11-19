@@ -126,7 +126,8 @@ def save_elec_file(db: DBSink, file_path: pathlib.Path, device_id: str) -> None:
         index = df.index
         values = df[column].values
         measurements = [
-            (dt, device_id, column, value) for dt, value in zip(index, values)
+            (dt, device_id, column, value)
+            for dt, value in zip(index, values, strict=True)
         ]
         db.insert_sql(measurements, op.ELEC)
 
@@ -143,7 +144,8 @@ def save_mbus_file(db: DBSink, file_path: pathlib.Path, device_id: str) -> None:
         index = df.index
         values = df[column].values
         measurements = [
-            (dt, device_id, column, value) for dt, value in zip(index, values)
+            (dt, device_id, column, value)
+            for dt, value in zip(index, values, strict=True)
         ]
         db.insert_sql(measurements, op.MBUS)
 
@@ -157,7 +159,9 @@ def save_peak_file(db: DBSink, file_path: pathlib.Path, device_id: str) -> None:
     print(f"Saving file {file_path} ...")
     index = df.index
     values = df["Default"].values
-    measurements = [(dt, device_id, value) for dt, value in zip(index, values)]
+    measurements = [
+        (dt, device_id, value) for dt, value in zip(index, values, strict=True)
+    ]
     db.insert_sql(measurements, op.PEAK)
 
 
@@ -170,7 +174,9 @@ def save_peak_history_file(db: DBSink, file_path: pathlib.Path, device_id: str) 
     print(f"Saving file {file_path} ...")
     index = df.index
     values = df["Default"].values
-    measurements = [(dt, device_id, dt, value) for dt, value in zip(index, values)]
+    measurements = [
+        (dt, device_id, dt, value) for dt, value in zip(index, values, strict=True)
+    ]
     db.insert_sql(measurements, op.PEAK_HISTORY)
 
 
