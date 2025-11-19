@@ -15,9 +15,6 @@ TOOLS := utils
 requirements/prod.txt: pyproject.toml
 	poetry export -o requirements/prod.txt -f requirements.txt --without-hashes 
 
-requirements/test.txt: pyproject.toml
-	poetry export -o requirements/test.txt -f requirements.txt --without-hashes --without main --with test
-
 requirements/dev.txt: pyproject.toml
 	poetry export -o requirements/dev.txt -f requirements.txt --without-hashes --without main --with dev
 
