@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.14,<4"
 dependencies = [
     "pydantic (>=2.12.4,<3.0.0)",
-    "pytz (>=2025.2,<2026.0)",
+    "pytz (>=2026.1.post1,<2027.0)",
     "dsmr-parser (>=1.4.3,<2.0.0)",
     "paho-mqtt (>=2.1.0,<3.0.0)",
     "pyyaml (>=6.0.3,<7.0.0)",
@@ -18,7 +18,7 @@ dependencies = [
     "pydantic-settings (>=2.12.0,<3.0.0)",
     "python-dateutil (>=2.9.0.post0,<3.0.0)",
     "psycopg[binary,pool] (>=3.2.12,<4.0.0)",
-    "cryptography (>=46.0.3,<47.0.0)"
+    "cryptography (>=47.0.0,<48.0.0)"
 ]
 
 
@@ -30,15 +30,15 @@ build-backend = "poetry.core.masonry.api"
 dev = [
     "pytest (>=9.0.1,<10.0.0)",
     "pytest-coverage (>=0.0,<0.1)",
-    "ruff (>=0.14.5,<0.15.0)",
+    "ruff (>=0.15.12,<0.16.0)",
     "python-dotenv (>=1.2.1,<2.0.0)",
     "mypy (>=1.18.2,<2.0.0)"
 ]
 opt = [
     "jupyterlab (>=4.5.0,<5.0.0)",
-    "pandas (>=2.3.3,<3.0.0)",
+    "pandas (>=3.0.2,<4.0.0)",
     "matplotlib (>=3.10.7,<4.0.0)",
-    "ipympl (>=0.9.8,<0.10.0)"
+    "ipympl (>=0.10.0,<0.11.0)"
 ]
 
 [tool.ruff.lint]
