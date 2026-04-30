@@ -1,3 +1,5 @@
+[![DOI](https://zenodo.org/badge/705881674.svg)](https://doi.org/10.5281/zenodo.19924839)
+
 # P1 Port monitoring tool
 
 Data logger and basic visualisation tool for Belgian Smart meters
